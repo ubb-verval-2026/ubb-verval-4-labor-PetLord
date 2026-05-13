@@ -128,6 +128,33 @@ public class PersonPageTests
         //wait a bit to see the result in the UI
         Thread.Sleep(2000);
     }
+
+    [Test]
+    public void Person_SalaryIncrease_BelowMinus10_ShouldShowValidationErrors()
+    {
+        // Arrange
+        driver.Navigate().GoToUrl(BaseURL);
+        Thread.Sleep(1500);
+        driver.FindElement(By.XPath("//*[@data-test='PersonPageNavigation']")).Click();
+        Thread.Sleep(1500);
+
+        var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
+
+        var input = wait.Until(ExpectedConditions.ElementToBeClickable(By.XPath("//*[@data-test='SalaryIncreasePercentageInput']")));
+        input.Clear();
+        input.SendKeys("-11");
+
+        // Act
+        var submitButton = wait.Until(ExpectedConditions.ElementToBeClickable(By.XPath("//*[@data-test='SalaryIncreaseSubmitButton']")));
+        submitButton.Click();
+
+        // Assert - error summary at the top of the form
+        var summaryError = wait.Until(ExpectedConditions.ElementIsVisible(By.CssSelector(".validation-message")));
+        summaryError.Text.Should().NotBeNullOrEmpty();
+
+        Thread.Sleep(2000);
+    }
+
     private bool IsElementPresent(By by)
     {
         try
